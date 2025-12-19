@@ -10,7 +10,6 @@ SPECIAL_LISTED_IN_PHRASES = [
 
 
 
-####
 def _standardise_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
@@ -50,12 +49,10 @@ def _split_multivalue(
         return restored
 
     return series.apply(split_one)
-####
 
 
 # streaming_func.py functuons for cleaning streaming dataframes
 def clean_streaming_df(df_raw: pd.DataFrame) -> pd.DataFrame:
-
     """
     Clean a streaming-catalog dataframe (Netflix / Disney+ / Prime style).
 
@@ -68,22 +65,8 @@ def clean_streaming_df(df_raw: pd.DataFrame) -> pd.DataFrame:
       - duration_mins (Int64)
       - duration_seasons (Int64)
     """
-    
-    ###
-    # df = df_raw.copy()
-    # # Standardize column names for easier access & manipulation
-    # df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
-    ###
 
     df = _standardise_columns(df_raw)
-    
-    ###
-    # # Split multi-value string columns into lists
-    # for col in ["cast", "country", "listed_in"]:
-    #     df[col] = df[col].fillna("").apply(
-    #         lambda s: [x.strip() for x in s.split(",")] if s else []
-    #     )
-    ###
 
     # Split multivalue fields into lists
     df["cast"] = _split_multivalue(df["cast"], sep=",")
@@ -127,11 +110,7 @@ def clean_streaming_df(df_raw: pd.DataFrame) -> pd.DataFrame:
 
     df["duration_mins"] = pd.to_numeric(mins, errors="coerce").astype("Int64")
     df["duration_seasons"] = pd.to_numeric(seasons, errors="coerce").astype("Int64")
-
-    ###
-    # df["rating"] = df["rating"].fillna("NaN")
-    ###
-    df["rating"] = df["rating"].astype("string")
+    df["rating"] = df["rating"].fillna("NaN")
 
     return df
 
@@ -147,29 +126,8 @@ def unique_actors_per_genre(df: pd.DataFrame) -> pd.Series:
     that have ever appeared in at least one title in that genre.
     """
 
-    # Explode genres & subsequently explode casts, so each row has 1 actor & 1 genre
+    # Explode genres & subsequently explode casts so each row has 1 actor & 1 genre
     exploded = df.explode("listed_in").explode("cast")
-
-    # Older version:
-    '''
-    exploded["listed_in"] = exploded["listed_in"].astype(str).str.strip()
-    exploded["cast"] = exploded["cast"].astype(str).str.strip()
-
-    mask = (
-        exploded["listed_in"].notna() &
-        (exploded["listed_in"] != "") &
-        exploded["cast"].notna() &
-        (exploded["cast"] != "")
-    )
-    exploded = exploded[mask]
-
-    genre_actor_counts = (
-        exploded
-        .groupby("listed_in")["cast"]
-        .nunique()          # <- unique actors per genre
-        .sort_values(ascending=False)
-    )
-    '''
 
     # Clean up: drop empty/NaN genres & actors
     l = exploded["listed_in"].astype("string").str.strip()
@@ -198,6 +156,7 @@ def plot_top_unique_actors(series, title, top_n=10, figsize=(10, 4)):
     plt.show()
 
 
+
 def plot_top_countries(country_col: pd.Series, title: str, top_n: int = 10, figsize=(10, 4)) -> pd.Series:
     """
     Plot top-N countries as a horizontal bar chart.
@@ -209,6 +168,7 @@ def plot_top_countries(country_col: pd.Series, title: str, top_n: int = 10, figs
 
     Returns the top-N counts (Series), useful if you want to print/save them.
     """
+
     s = country_col.explode()
 
     s = s.dropna().astype(str).str.strip()
@@ -222,5 +182,3 @@ def plot_top_countries(country_col: pd.Series, title: str, top_n: int = 10, figs
     ax.set_ylabel("Country")
     plt.tight_layout()
     plt.show()
-
-    return top
