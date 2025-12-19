@@ -74,33 +74,6 @@ def clean_streaming_df(df_raw: pd.DataFrame) -> pd.DataFrame:
     df["listed_in"] = _split_multivalue(
         df["listed_in"], sep=",", protect_phrases=SPECIAL_LISTED_IN_PHRASES
     )
-    
-    ###
-    # # Extract duration as numeric (for movies) or number of seasons/episodes (for TV shows)    
-    # def parse_minutes(x):
-    #     if isinstance(x, str):
-    #         s = x.strip()
-    #         if "min" in s:
-    #             try:
-    #                 return int(s.split()[0])
-    #             except ValueError:
-    #                 return None
-    #     return None
-    
-    # def parse_seasons(x):
-    #     if isinstance(x, str):
-    #         s = x.strip()
-    #         # handle both singular "Season" and plural "Seasons"
-    #         if "Season" in s or "Seasons" in s:
-    #             try:
-    #                 return int(s.split()[0])
-    #             except ValueError:
-    #                 return None
-    #     return None
-    
-    # df["duration_mins"] = df["duration"].apply(parse_minutes)
-    # df["duration_seasons"] = df["duration"].apply(parse_seasons)
-    ###
 
     # Parse duration using regex (robust + readable)
     duration = df["duration"].astype("string")
@@ -182,3 +155,23 @@ def plot_top_countries(country_col: pd.Series, title: str, top_n: int = 10, figs
     ax.set_ylabel("Country")
     plt.tight_layout()
     plt.show()
+
+
+# Functions for EDA explorer of streaming platforms
+def describe_catalog(df: pd.DataFrame):
+    return None
+
+def plot_genre_distribution(df: pd.DataFrame, platform_name: str):
+    return None
+
+def plot_country_distribution(df: pd.DataFrame, platform_name: str):
+    return None
+
+def plot_runtime_distribution(df: pd.DataFrame, platform_name: str):
+    return None
+
+def run_platform_eda(df, platform_name):
+    describe_catalog(df)
+    plot_genre_distribution(df, platform_name)
+    plot_country_distribution(df, platform_name)
+    plot_runtime_distribution(df, platform_name)
