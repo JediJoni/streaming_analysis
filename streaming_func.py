@@ -1,5 +1,6 @@
 # importing necessary libraries
 import pandas as pd
+from matplotlib import pyplot as plt
 
 # streaming_func.py functuons for cleaning streaming dataframes
 def clean_streaming_df(df_raw):
@@ -83,3 +84,13 @@ def unique_actors_per_genre(df: pd.DataFrame) -> pd.Series:
     )
 
     return genre_actor_counts
+
+
+def plot_top_unique_actors(series, title, top_n=10, figsize=(10, 4)):
+    top = series.sort_values(ascending=False).head(top_n).sort_values()
+    ax = top.plot(kind="barh", figsize=figsize)
+    ax.set_title(title)
+    ax.set_xlabel("Number of unique actors")
+    ax.set_ylabel("Genre")
+    plt.tight_layout()
+    plt.show()
